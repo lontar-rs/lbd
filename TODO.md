@@ -46,7 +46,7 @@ _Working read API backed by seed data. No Aksara rendering yet._
   - [x] `GET /corpus/:id`
   - [x] Auth middleware (JWT) for write endpoints
   - [x] `POST /entries` — create draft (authenticated)
-  - [ ] `PUT /entries/:id` — update with event log (stub exists)
+  - [x] `PUT /entries/:id` — update with event log
 - [ ] Meilisearch
   - [ ] Index schema (lemma_latin, def_indonesian, def_english, register, domain, pos) **[deferred: SDK type compatibility]**
   - [ ] Sync job: PostgreSQL → Meilisearch on publish
