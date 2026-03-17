@@ -1,9 +1,6 @@
 use axum::{
-    body::Body,
     extract::{Path, State},
-    http::{Request, StatusCode},
-    middleware::{self, Next},
-    response::Response,
+    middleware,
     routing::{get, post, put},
     Json, Router,
 };
@@ -11,7 +8,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{error::AppError, models::entry::Entry};
+use crate::{auth::jwt_middleware, error::AppError, models::entry::Entry};
 
 use super::AppState;
 
@@ -45,6 +42,13 @@ struct RegisterDto {
     level: String,
     dialect: Option<String>,
     equivalent_id: Option<Uuid>,
+}
+
+#[derive(Deserialize)]
+#[allow(dead_code)]
+struct UpdateEntryRequest {
+    pos: Option<String>,
+    status: Option<String>,
 }
 
 #[derive(Serialize)]
@@ -81,11 +85,11 @@ pub fn routes() -> Router<AppState> {
         .route("/entries/:id/attestations", get(get_attestations))
         .route(
             "/entries",
-            post(create_entry).route_layer(middleware::from_fn(auth_stub)),
+            post(create_entry).route_layer(middleware::from_fn(jwt_middleware)),
         )
         .route(
             "/entries/id/:id",
-            put(update_entry).route_layer(middleware::from_fn(auth_stub)),
+            put(update_entry).route_layer(middleware::from_fn(jwt_middleware)),
         )
 }
 
@@ -216,7 +220,6 @@ async fn create_entry(
 }
 
 async fn update_entry(Path(id): Path<Uuid>) -> Result<String, AppError> {
-    // Placeholder: will implement event-log-based update later
     Ok(format!("update stub for entry {id}"))
 }
 
@@ -256,16 +259,4 @@ async fn get_attestations(
         .collect();
 
     Ok(Json(attns))
-}
-
-// Stub auth middleware: checks for presence of Authorization header; returns 401 otherwise
-async fn auth_stub(req: Request<Body>, next: Next) -> Result<Response, StatusCode> {
-    if req
-        .headers()
-        .get(axum::http::header::AUTHORIZATION)
-        .is_none()
-    {
-        return Err(StatusCode::UNAUTHORIZED);
-    }
-    Ok(next.run(req).await)
 }

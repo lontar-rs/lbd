@@ -13,6 +13,10 @@ impl SearchClient {
         Self { inner }
     }
 
+    pub fn inner(&self) -> &Client {
+        &self.inner
+    }
+
     pub async fn search(
         &self,
         index: &str,
