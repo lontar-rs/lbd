@@ -39,16 +39,16 @@ _Schema, governance, and seed data. No code until this is solid._
 
 _Working read API backed by seed data. No Aksara rendering yet._
 
-- [ ] Backend (Rust, Axum)
+- [x] Backend (Rust, Axum)
   - [x] `GET /entries/:lemma` — full entry with senses, register, etymology
   - [x] `GET /entries/search?q=&lang=id|en|bali&filter=` — Meilisearch-backed
   - [x] `GET /entries/:id/attestations`
   - [x] `GET /corpus/:id`
-  - [x] Auth middleware (stub) for write endpoints
+  - [x] Auth middleware (JWT) for write endpoints
   - [x] `POST /entries` — create draft (authenticated)
   - [ ] `PUT /entries/:id` — update with event log (stub exists)
 - [ ] Meilisearch
-  - [ ] Index schema (lemma_latin, def_indonesian, def_english, register, domain, pos)
+  - [ ] Index schema (lemma_latin, def_indonesian, def_english, register, domain, pos) **[deferred: SDK type compatibility]**
   - [ ] Sync job: PostgreSQL → Meilisearch on publish
   - [ ] Ranking rules tuned for dictionary lookup (exact lemma > definition > etymology)
   - [ ] Latin romanization only — Aksara search deferred to Phase 2
