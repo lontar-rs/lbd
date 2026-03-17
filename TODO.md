@@ -13,11 +13,11 @@ _Schema, governance, and seed data. No code until this is solid._
   - [x] Define domain taxonomy (general | medical | ritual | agricultural | legal | literary | botanical | ...) — see `migrations/002_domain_authority.sql`
   - [x] Define source authority ranking table — see `migrations/002_domain_authority.sql`
   - [x] Write and run migrations (sqlx) — applied `001_initial_schema.sql` previously; `002_domain_authority.sql` pending for new environments
-- [ ] Editorial governance (non-technical, prerequisite)
-  - [ ] Define editor roles: contributor | reviewer | editor | admin
-  - [ ] Define entry lifecycle: draft → reviewed → published
-  - [ ] Define dispute resolution process for contested entries
-  - [ ] Document what constitutes a valid attestation (source rank threshold)
+- [x] Editorial governance (non-technical, prerequisite) — see `GOVERNANCE.md`
+  - [x] Define editor roles: contributor | reviewer | editor | admin
+  - [x] Define entry lifecycle: draft → reviewed → published
+  - [x] Define dispute resolution process for contested entries
+  - [x] Document what constitutes a valid attestation (source rank threshold)
 - [ ] Seed data — Entry layer
   - [ ] Import Balai Bahasa Bali *Kamus Bali–Indonesia* (3rd ed.) as draft entries — Latin romanization only
   - [ ] Cross-reference with Sutjaja Tuttle (~18,000 entries) for English definitions
