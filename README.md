@@ -151,7 +151,7 @@ curl http://127.0.0.1:3000/entries/padem
 
 Dictionary data: [Creative Commons Attribution-ShareAlike 4.0 (CC BY-SA 4.0)](https://creativecommons.org/licenses/by-sa/4.0/)
 
-Software: Licensed under either of MIT or Apache-2.0 at your option.
+Software: Licensed under Apache-2.0.
 
 ---
 
