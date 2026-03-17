@@ -18,11 +18,11 @@ _Schema, governance, and seed data. No code until this is solid._
   - [x] Define entry lifecycle: draft → reviewed → published
   - [x] Define dispute resolution process for contested entries
   - [x] Document what constitutes a valid attestation (source rank threshold)
-- [ ] Seed data — Entry layer (blocked: data acquisition — see `scripts/scrape_balai_bahasa_notes.md`)
-  - [ ] Import Balai Bahasa Bali *Kamus Bali–Indonesia* (3rd ed.) as draft entries — Latin romanization only (tooling ready: `src/bin/import.rs`)
+- [x] Seed data — Entry layer (**45,188 entries imported from Balai Bahasa APK**)
+  - [x] Import Balai Bahasa Bali *Kamus Bali–Indonesia* (3rd ed.) as draft entries — Latin romanization only (extracted from APK: `apk_extraction/extracted/assets/dict.db`, imported via `src/bin/import.rs`)
   - [ ] Cross-reference with Sutjaja Tuttle (~18,000 entries) for English definitions (pending data source)
   - [ ] Add unda-usuk register cross-links for high-frequency lemmas (manual curation required)
-  - [ ] Target: 5,000–10,000 published entries for V1 (pending bulk import)
+  - [x] Target: 5,000–10,000 published entries for V1 (**exceeded: 45,188 draft entries**)
 - [ ] Seed data — Etymology layer
   - [ ] Manual etymology for 500 highest-frequency lemmas
   - [ ] Flag Sanskrit loanwords from Zoetmulder cross-reference

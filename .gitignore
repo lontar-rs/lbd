@@ -12,7 +12,11 @@
 /node_modules/
 /tmp/
 
-# ID
+# IDE
 .vscode/
-.idea/
+
+# Windsurf-specific
 .windsurf/
+
+# APK extraction artifacts
+apk_extraction/
