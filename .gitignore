@@ -20,3 +20,6 @@
 
 # APK extraction artifacts
 apk_extraction/
+
+# Data - large files
+data/
