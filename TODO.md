@@ -48,14 +48,14 @@ _Working read API backed by seed data. No Aksara rendering yet._
   - [x] `POST /entries` — create draft (authenticated)
   - [x] `PUT /entries/:id` — update with event log
 - [ ] Meilisearch
-  - [ ] Index schema (lemma_latin, def_indonesian, def_english, register, domain, pos) **[deferred: SDK type compatibility]**
-  - [ ] Sync job: PostgreSQL → Meilisearch on publish
-  - [ ] Ranking rules tuned for dictionary lookup (exact lemma > definition > etymology)
+  - [x] Index schema (lemma_latin, def_indonesian, def_english, register, domain, pos)
+  - [x] Sync job: PostgreSQL → Meilisearch on publish
+  - [x] Ranking rules tuned for dictionary lookup (exact lemma > definition > etymology)
   - [ ] Latin romanization only — Aksara search deferred to Phase 2
-- [ ] Offline export
-  - [ ] SQLite snapshot generation from PostgreSQL
-  - [ ] Scheduled export (weekly)
-  - [ ] Download endpoint
+- [x] Offline export
+  - [x] SQLite snapshot generation from PostgreSQL
+  - [x] Scheduled export (weekly)
+  - [x] Download endpoint
 
 ---
 

@@ -7,6 +7,7 @@ mod models;
 mod search;
 
 use axum::Router;
+use handlers::exports::start_export_scheduler;
 use tokio::net::TcpListener;
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::EnvFilter;
@@ -26,7 +27,11 @@ async fn main() -> Result<(), error::AppError> {
     let app_state = handlers::AppState {
         pool,
         search: search_client,
+        export_dir: cfg.export_dir.clone(),
     };
+
+    // Start scheduled weekly exports
+    tokio::spawn(start_export_scheduler(app_state.clone()));
 
     let app = Router::new()
         .merge(handlers::routes())

@@ -9,6 +9,7 @@ pub struct AppConfig {
     pub meilisearch_key: String,
     pub host: String,
     pub port: u16,
+    pub export_dir: String,
 }
 
 impl AppConfig {
@@ -23,6 +24,7 @@ impl AppConfig {
             .unwrap_or_else(|_| "3000".into())
             .parse()
             .map_err(|_| AppError::Config("SERVER_PORT must be a number".into()))?;
+        let export_dir = env::var("EXPORT_DIR").unwrap_or_else(|_| "exports".into());
 
         Ok(Self {
             database_url,
@@ -30,6 +32,7 @@ impl AppConfig {
             meilisearch_key,
             host,
             port,
+            export_dir,
         })
     }
 }

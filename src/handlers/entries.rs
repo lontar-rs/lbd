@@ -188,6 +188,63 @@ async fn get_entry(
     }))
 }
 
+#[derive(serde::Serialize)]
+struct MeiliEntryDoc {
+    id: Uuid,
+    lemma_latin: String,
+    pos: Option<String>,
+    domain: Vec<String>,
+    register: Vec<String>,
+    def_indonesian: Option<String>,
+    def_english: Option<String>,
+}
+
+async fn sync_entry_to_meili(state: &AppState, entry_id: Uuid) -> Result<(), AppError> {
+    let row = sqlx::query!(
+        r#"
+        SELECT
+            e.id,
+            e.lemma_latin,
+            e.pos,
+            array_remove(array_agg(DISTINCT s.domain), NULL) AS domains,
+            array_remove(array_agg(DISTINCT er.level), NULL) AS registers,
+            (SELECT def_indonesian FROM sense WHERE entry_id = $1 ORDER BY sense_order LIMIT 1) AS def_indonesian,
+            (SELECT def_english FROM sense WHERE entry_id = $1 ORDER BY sense_order LIMIT 1) AS def_english
+        FROM entry e
+        LEFT JOIN sense s ON s.entry_id = e.id
+        LEFT JOIN entry_register er ON er.entry_id = e.id
+        WHERE e.id = $1
+        GROUP BY e.id, e.lemma_latin, e.pos
+        "#,
+        entry_id
+    )
+    .fetch_optional(&state.pool)
+    .await
+    .map_err(|e| AppError::Database(format!("meili fetch error: {e}")))?
+    .ok_or(AppError::NotFound)?;
+
+    let domains: Vec<String> = row.domains.unwrap_or_default();
+    let registers: Vec<String> = row.registers.unwrap_or_default();
+
+    let doc = MeiliEntryDoc {
+        id: row.id,
+        lemma_latin: row.lemma_latin,
+        pos: row.pos,
+        domain: domains,
+        register: registers,
+        def_indonesian: row.def_indonesian,
+        def_english: row.def_english,
+    };
+
+    let index = state.search.inner().index("entries");
+    index
+        .add_or_replace(&[doc], Some("id"))
+        .await
+        .map_err(|e| AppError::Search(format!("meili sync error: {e}")))?;
+
+    Ok(())
+}
+
 async fn create_entry(
     State(state): State<AppState>,
     Json(payload): Json<CreateEntryRequest>,
@@ -224,6 +281,23 @@ async fn update_entry(
     Path(id): Path<Uuid>,
     Json(payload): Json<UpdateEntryRequest>,
 ) -> Result<Json<EntryResponse>, AppError> {
+    // Fetch current status for publish detection
+    let current = sqlx::query!(
+        r#"
+        SELECT status FROM entry WHERE id = $1
+        "#,
+        id
+    )
+    .fetch_optional(&state.pool)
+    .await
+    .map_err(|e| AppError::Database(format!("status fetch error: {e}")))?;
+
+    if current.is_none() {
+        return Err(AppError::NotFound);
+    }
+
+    let prev_status = current.unwrap().status;
+
     // Start transaction
     let mut tx = state
         .pool
@@ -285,6 +359,17 @@ async fn update_entry(
     tx.commit()
         .await
         .map_err(|e| AppError::Database(format!("commit error: {e}")))?;
+
+    // If published now, push to Meilisearch
+    if payload
+        .status
+        .as_deref()
+        .map(|s| s == "published")
+        .unwrap_or(false)
+        && prev_status != "published"
+    {
+        sync_entry_to_meili(&state, id).await?;
+    }
 
     // Fetch full entry with related data
     let senses = sqlx::query!(
