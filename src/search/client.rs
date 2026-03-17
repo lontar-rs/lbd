@@ -1,10 +1,10 @@
 use meilisearch_sdk::client::Client;
+use meilisearch_sdk::search::SearchQuery;
 
 use crate::error::AppError;
 
 #[derive(Clone)]
 pub struct SearchClient {
-    #[allow(dead_code)]
     inner: Client,
 }
 
@@ -19,12 +19,28 @@ impl SearchClient {
         query: &str,
         filter: Option<&str>,
     ) -> Result<serde_json::Value, AppError> {
-        let _ = (index, query, filter); // placeholders until search wiring is completed
-                                        // TODO: wire real Meilisearch query when index schema is ready
+        let index_handle = self.inner.index(index);
+        let mut builder = SearchQuery::new(&index_handle);
+        builder.with_query(query);
+        if let Some(f) = filter {
+            builder.with_filter(f);
+        }
+
+        let res = builder
+            .execute::<serde_json::Value>()
+            .await
+            .map_err(|e| AppError::Search(e.to_string()))?;
+
+        let hits: Vec<serde_json::Value> = res.hits.into_iter().map(|h| h.result).collect();
+
         Ok(serde_json::json!({
-            "hits": [],
-            "estimated_total_hits": 0,
-            "query": query,
+            "hits": hits,
+            "offset": res.offset,
+            "limit": res.limit,
+            "estimated_total_hits": res.estimated_total_hits,
+            "processing_time_ms": res.processing_time_ms,
+            "query": res.query,
+            "facet_distribution": res.facet_distribution,
         }))
     }
 }
