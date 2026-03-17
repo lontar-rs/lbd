@@ -1,8 +1,13 @@
 use axum::{
+    body::Body,
     extract::{Path, State},
+    http::{Request, StatusCode},
+    middleware::{self, Next},
+    response::Response,
     routing::{get, post, put},
     Json, Router,
 };
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -13,6 +18,9 @@ use super::AppState;
 #[derive(Serialize)]
 struct EntryResponse {
     entry: Entry,
+    senses: Vec<SenseDto>,
+    registers: Vec<RegisterDto>,
+    etymologies: Vec<EtymologyDto>,
 }
 
 #[derive(Deserialize)]
@@ -21,18 +29,71 @@ struct CreateEntryRequest {
     pos: Option<String>,
 }
 
+#[derive(Serialize)]
+struct SenseDto {
+    id: Uuid,
+    sense_order: i32,
+    def_balinese: Option<String>,
+    def_indonesian: String,
+    def_english: Option<String>,
+    domain: Option<String>,
+    created_at: DateTime<Utc>,
+}
+
+#[derive(Serialize)]
+struct RegisterDto {
+    level: String,
+    dialect: Option<String>,
+    equivalent_id: Option<Uuid>,
+}
+
+#[derive(Serialize)]
+struct EtymologyDto {
+    id: Uuid,
+    proto_austronesian: Option<String>,
+    proto_mp: Option<String>,
+    sanskrit: Option<String>,
+    kawi: Option<String>,
+    old_balinese: Option<String>,
+    loan_source: Option<String>,
+    loan_form: Option<String>,
+    notes: Option<String>,
+    confidence: String,
+}
+
+#[derive(Serialize)]
+struct AttestationDto {
+    id: Uuid,
+    sense_id: Uuid,
+    corpus_id: Uuid,
+    quote_aksara: Option<String>,
+    quote_latin: Option<String>,
+    quote_trans_id: Option<String>,
+    quote_trans_en: Option<String>,
+    confidence: Option<f32>,
+    source_rank: i32,
+    created_at: DateTime<Utc>,
+}
+
 pub fn routes() -> Router<AppState> {
     Router::new()
         .route("/entries/:lemma", get(get_entry))
-        .route("/entries", post(create_entry))
-        .route("/entries/id/:id", put(update_entry))
+        .route("/entries/:id/attestations", get(get_attestations))
+        .route(
+            "/entries",
+            post(create_entry).route_layer(middleware::from_fn(auth_stub)),
+        )
+        .route(
+            "/entries/id/:id",
+            put(update_entry).route_layer(middleware::from_fn(auth_stub)),
+        )
 }
 
 async fn get_entry(
     State(state): State<AppState>,
     Path(lemma): Path<String>,
 ) -> Result<Json<EntryResponse>, AppError> {
-    let rec = sqlx::query_as!(
+    let entry = sqlx::query_as!(
         Entry,
         r#"
         SELECT id, lemma_latin, lemma_aksara, ipa, pos, root, status, created_at, updated_at
@@ -43,13 +104,84 @@ async fn get_entry(
     )
     .fetch_optional(&state.pool)
     .await
-    .map_err(|e| AppError::Database(format!("query error: {e}")))?;
+    .map_err(|e| AppError::Database(format!("query error: {e}")))?
+    .ok_or(AppError::NotFound)?;
 
-    let Some(entry) = rec else {
-        return Err(AppError::NotFound);
-    };
+    let senses = sqlx::query!(
+        r#"
+        SELECT id, sense_order, def_balinese, def_indonesian, def_english, domain, created_at
+        FROM sense
+        WHERE entry_id = $1
+        ORDER BY sense_order
+        "#,
+        entry.id
+    )
+    .fetch_all(&state.pool)
+    .await
+    .map_err(|e| AppError::Database(format!("senses query error: {e}")))?
+    .into_iter()
+    .map(|row| SenseDto {
+        id: row.id,
+        sense_order: row.sense_order,
+        def_balinese: row.def_balinese,
+        def_indonesian: row.def_indonesian,
+        def_english: row.def_english,
+        domain: row.domain,
+        created_at: row.created_at,
+    })
+    .collect();
 
-    Ok(Json(EntryResponse { entry }))
+    let registers = sqlx::query!(
+        r#"
+        SELECT level, dialect, equivalent_id
+        FROM entry_register
+        WHERE entry_id = $1
+        "#,
+        entry.id
+    )
+    .fetch_all(&state.pool)
+    .await
+    .map_err(|e| AppError::Database(format!("register query error: {e}")))?
+    .into_iter()
+    .map(|row| RegisterDto {
+        level: row.level,
+        dialect: row.dialect,
+        equivalent_id: row.equivalent_id,
+    })
+    .collect();
+
+    let etymologies = sqlx::query!(
+        r#"
+        SELECT id, proto_austronesian, proto_mp, sanskrit, kawi, old_balinese, loan_source, loan_form, notes, confidence
+        FROM etymology
+        WHERE entry_id = $1
+        "#,
+        entry.id
+    )
+    .fetch_all(&state.pool)
+    .await
+    .map_err(|e| AppError::Database(format!("etymology query error: {e}")))?
+    .into_iter()
+    .map(|row| EtymologyDto {
+        id: row.id,
+        proto_austronesian: row.proto_austronesian,
+        proto_mp: row.proto_mp,
+        sanskrit: row.sanskrit,
+        kawi: row.kawi,
+        old_balinese: row.old_balinese,
+        loan_source: row.loan_source,
+        loan_form: row.loan_form,
+        notes: row.notes,
+        confidence: row.confidence,
+    })
+    .collect();
+
+    Ok(Json(EntryResponse {
+        entry,
+        senses,
+        registers,
+        etymologies,
+    }))
 }
 
 async fn create_entry(
@@ -75,10 +207,65 @@ async fn create_entry(
     .await
     .map_err(|e| AppError::Database(format!("insert error: {e}")))?;
 
-    Ok(Json(EntryResponse { entry: rec }))
+    Ok(Json(EntryResponse {
+        entry: rec,
+        senses: vec![],
+        registers: vec![],
+        etymologies: vec![],
+    }))
 }
 
 async fn update_entry(Path(id): Path<Uuid>) -> Result<String, AppError> {
     // Placeholder: will implement event-log-based update later
     Ok(format!("update stub for entry {id}"))
+}
+
+async fn get_attestations(
+    State(state): State<AppState>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<Vec<AttestationDto>>, AppError> {
+    // Fetch attestations by entry id via senses
+    let rows = sqlx::query!(
+        r#"
+        SELECT a.id, a.sense_id as "sense_id!", a.corpus_id as "corpus_id!", a.quote_aksara, a.quote_latin, a.quote_trans_id, a.quote_trans_en, a.confidence::float8 as confidence, a.source_rank, a.created_at
+        FROM attestation a
+        JOIN sense s ON a.sense_id = s.id
+        WHERE s.entry_id = $1
+        ORDER BY a.created_at DESC
+        "#,
+        id
+    )
+    .fetch_all(&state.pool)
+    .await
+    .map_err(|e| AppError::Database(format!("attestation query error: {e}")))?;
+
+    let attns = rows
+        .into_iter()
+        .map(|row| AttestationDto {
+            id: row.id,
+            sense_id: row.sense_id,
+            corpus_id: row.corpus_id,
+            quote_aksara: row.quote_aksara,
+            quote_latin: row.quote_latin,
+            quote_trans_id: row.quote_trans_id,
+            quote_trans_en: row.quote_trans_en,
+            confidence: row.confidence.map(|c| c as f32),
+            source_rank: row.source_rank,
+            created_at: row.created_at,
+        })
+        .collect();
+
+    Ok(Json(attns))
+}
+
+// Stub auth middleware: checks for presence of Authorization header; returns 401 otherwise
+async fn auth_stub(req: Request<Body>, next: Next) -> Result<Response, StatusCode> {
+    if req
+        .headers()
+        .get(axum::http::header::AUTHORIZATION)
+        .is_none()
+    {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+    Ok(next.run(req).await)
 }
