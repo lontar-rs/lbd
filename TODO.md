@@ -9,10 +9,10 @@ Development roadmap for the Lontar Balinese Dictionary (LBD). Phases are sequent
 _Schema, governance, and seed data. No code until this is solid._
 
 - [ ] Schema
-  - [ ] Finalize PostgreSQL DDL for all core tables (`entry`, `sense`, `attestation`, `corpus`, `etymology`, `cross_ref`, `entry_register`, `entry_event`)
-  - [ ] Define domain taxonomy (general | medical | ritual | agricultural | legal | literary | botanical | ...)
-  - [ ] Define source authority ranking table
-  - [ ] Write and run migrations (sqlx)
+  - [x] Finalize PostgreSQL DDL for all core tables (`entry`, `sense`, `attestation`, `corpus`, `etymology`, `cross_ref`, `entry_register`, `entry_event`) — see `migrations/001_initial_schema.sql`
+  - [x] Define domain taxonomy (general | medical | ritual | agricultural | legal | literary | botanical | ...) — see `migrations/002_domain_authority.sql`
+  - [x] Define source authority ranking table — see `migrations/002_domain_authority.sql`
+  - [x] Write and run migrations (sqlx) — applied `001_initial_schema.sql` previously; `002_domain_authority.sql` pending for new environments
 - [ ] Editorial governance (non-technical, prerequisite)
   - [ ] Define editor roles: contributor | reviewer | editor | admin
   - [ ] Define entry lifecycle: draft → reviewed → published
