@@ -63,53 +63,53 @@ _Working read API backed by seed data. No Aksara rendering yet._
 
 _The public dictionary interface. Depends on Phase 1 API. Latin romanization only — Aksara rendering deferred to Phase 2._
 
-- [ ] Tech decision
-  - [ ] Framework: SvelteKit (preferred — minimal JS, SSR, good i18n) or Next.js
-  - [ ] Deployment: static export or SSR (depends on search latency requirements)
-  - [ ] Noto Serif Balinese font preloaded globally (for Aksara fields once Phase 2 lands)
-- [ ] Entry page (`/entry/:lemma`)
-  - [ ] Lemma heading: Latin romanization + Aksara Bali (placeholder until Phase 2) + IPA
-  - [ ] Part of speech + register badge
-  - [ ] Unda-usuk register block: alus singgih / alus sor / alus mider / andap / kasar — all cross-linked
-  - [ ] Senses list (ordered, numbered, domain-tagged)
-  - [ ] Each sense: definition in ID + EN, domain tag
-  - [ ] Attestations per sense: source, date range, quote (latin + translation), confidence indicator
-  - [ ] Etymology panel: layered chain (Proto-Austronesian → Sanskrit → Kawi → Modern)
-  - [ ] Cross-references: synonyms, antonyms, see also
-  - [ ] Cite this entry (formatted citation: LBD, lemma, accessed date)
-- [ ] Search
-  - [ ] Landing page: search bar, language toggle (Bali / ID / EN)
-  - [ ] Instant search results (Meilisearch, debounced)
-  - [ ] Result card: lemma, register, first sense definition, domain tag
-  - [ ] Filter panel: register | domain | POS | dialect
-  - [ ] No-results state: suggest closest matches
-  - [ ] Aksara Bali input support deferred to Phase 2
-- [ ] Browse
-  - [ ] Alphabetical index (Latin)
-  - [ ] Browse by domain (ritual | medical | agricultural | ...)
-  - [ ] Browse by register level
-  - [ ] Browse by etymology origin (Sanskrit | Kawi | Austronesian | Dutch | ...)
+- [x] Tech decision
+  - [x] Framework: SvelteKit (preferred — minimal JS, SSR, good i18n) or Next.js
+  - [x] Deployment: static export or SSR (depends on search latency requirements)
+  - [x] Noto Serif Balinese font preloaded globally (for Aksara fields once Phase 2 lands)
+- [x] Entry page (`/entry/:lemma`)
+  - [x] Lemma heading: Latin romanization + Aksara Bali (placeholder until Phase 2) + IPA
+  - [x] Part of speech + register badge
+  - [x] Unda-usuk register block: alus singgih / alus sor / alus mider / andap / kasar — all cross-linked
+  - [x] Senses list (ordered, numbered, domain-tagged)
+  - [x] Each sense: definition in ID + EN, domain tag
+  - [x] Attestations per sense: source, date range, quote (latin + translation), confidence indicator
+  - [x] Etymology panel: layered chain (Proto-Austronesian → Sanskrit → Kawi → Modern)
+  - [x] Cross-references: synonyms, antonyms, see also
+  - [x] Cite this entry (formatted citation: LBD, lemma, accessed date)
+- [x] Search
+  - [x] Landing page: search bar, language toggle (Bali / ID / EN)
+  - [x] Instant search results (Meilisearch, debounced)
+  - [x] Result card: lemma, register, first sense definition, domain tag
+  - [x] Filter panel: register | domain | POS | dialect
+  - [x] No-results state: suggest closest matches
+  - [x] Aksara Bali input support deferred to Phase 2
+- [x] Browse
+  - [x] Alphabetical index (Latin)
+  - [x] Browse by domain (ritual | medical | agricultural | ...)
+  - [x] Browse by register level
+  - [x] Browse by etymology origin (Sanskrit | Kawi | Austronesian | Dutch | ...)
 - [ ] Corpus page (`/corpus/:id`)
   - [ ] Manuscript metadata: title, type, date range, location held, digitization status
   - [ ] List of attestations derived from this corpus
   - [ ] Link to source image (Internet Archive or institutional) where available
-- [ ] Static pages
-  - [ ] About LBD: scope, methodology, relationship to OED model
-  - [ ] Sources: full bibliography of primary sources and foundational lexicographic works
-  - [ ] Editorial policy: what constitutes a valid entry, attestation standards, dispute process
-  - [ ] API documentation (link to OpenAPI spec)
-  - [ ] How to contribute
-- [ ] i18n
-  - [ ] UI language toggle: Bahasa Indonesia / English
-  - [ ] All UI chrome translated (not entry content — that is trilingual by definition)
-- [ ] Accessibility
-  - [ ] Semantic HTML throughout
-  - [ ] Keyboard navigation for search and browse
-  - [ ] Screen reader labels for script/register badges
-- [ ] Performance
-  - [ ] Entry pages statically generated for published entries (SSG)
-  - [ ] Search fully client-side via Meilisearch JS SDK
-  - [ ] Font subsetting for Noto Serif Balinese (large font file — subset to used codepoints)
+- [x] Static pages
+  - [x] About LBD: scope, methodology, relationship to OED model
+  - [x] Sources: full bibliography of primary sources and foundational lexicographic works
+  - [x] Editorial policy: what constitutes a valid entry, attestation standards, dispute process
+  - [x] API documentation (link to OpenAPI spec)
+  - [x] How to contribute
+- [x] i18n
+  - [x] UI language toggle: Bahasa Indonesia / English
+  - [x] All UI chrome translated (not entry content — that is trilingual by definition)
+- [x] Accessibility
+  - [x] Semantic HTML throughout
+  - [x] Keyboard navigation for search and browse
+  - [x] Screen reader labels for script/register badges
+- [x] Performance
+  - [x] Entry pages statically generated for published entries (SSG)
+  - [x] Search fully client-side via Meilisearch JS SDK
+  - [x] Font subsetting for Noto Serif Balinese (large font file — subset to used codepoints)
 
 ---
 
