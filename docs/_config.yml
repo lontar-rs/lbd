@@ -1,0 +1,81 @@
+# Jekyll Configuration for Lontar Balinese Dictionary Documentation
+
+# Site settings
+title: "Lontar Balinese Dictionary"
+description: "The historical dictionary of the Balinese language — Balinese · Indonesian · English"
+baseurl: "/lbd"
+url: "https://lontar-rs.github.io"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+
+# Plugins
+plugins:
+  - jekyll-sitemap
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# Collections
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:name/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "docs"
+    values:
+      layout: "default"
+      sidebar: true
+
+# Navigation
+navigation:
+  - title: "Getting Started"
+    children:
+      - title: "Quick Start"
+        url: "/docs/quickstart/"
+      - title: "Installation"
+        url: "/docs/installation/"
+      - title: "Project Overview"
+        url: "/"
+  - title: "Development"
+    children:
+      - title: "Development Guide"
+        url: "/docs/development/"
+      - title: "Contributing Guide"
+        url: "/docs/contributing/"
+      - title: "API Reference"
+        url: "/docs/api/"
+      - title: "Changelog"
+        url: "/docs/changelog/"
+  - title: "Project"
+    children:
+      - title: "Roadmap"
+        url: "/docs/todo/"
+
+# Exclude files
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - README.md
+  - package.json
+  - package-lock.json
+
+# Include files
+include:
+  - _pages
+
+# SEO
+logo: "/assets/images/logo.png"
+twitter:
+  username: lontar_dict
+  card: summary
+
+# Google Analytics (optional)
+google_analytics: UA-123456789-1

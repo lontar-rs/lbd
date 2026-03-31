@@ -1,3 +1,15 @@
+---
+layout: default
+title: "Quick Start"
+description: "Get the Lontar Balinese Dictionary running in 5 minutes"
+prev:
+  title: "Installation"
+  url: "/docs/installation/"
+next:
+  title: "Installation"
+  url: "/docs/installation/"
+---
+
 # 🚀 Quick Start Guide
 
 Get the Lontar Balinese Dictionary running in 5 minutes!

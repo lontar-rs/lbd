@@ -1,3 +1,15 @@
+---
+layout: default
+title: "Contributing Guide"
+description: "How to contribute to the Lontar Balinese Dictionary project"
+prev:
+  title: "Development Guide"
+  url: "/docs/development/"
+next:
+  title: "API Reference"
+  url: "/docs/api/"
+---
+
 # 🤝 Contributing to Lontar Balinese Dictionary
 
 Thank you for helping build the Lontar Balinese Dictionary! We welcome contributions from developers, linguists, and Balinese language enthusiasts.
@@ -6,7 +18,7 @@ Thank you for helping build the Lontar Balinese Dictionary! We welcome contribut
 
 ```bash
 # 1. Fork and clone the repository
-git clone https://github.com/YOUR-USERNAME/lontar-rs/lbd.git
+git clone https://github.com/YOUR-USERNAME/lbd.git
 cd lbd
 
 # 2. Run the automated setup (installs everything!)
@@ -273,16 +285,16 @@ cargo run --bin import -- --file data/words.csv --source custom
 ## 🚀 Getting Help
 
 ### **Resources**
-- **README.md**: Project overview and setup
-- **DEVELOPMENT.md**: Detailed development guide
-- **TODO.md**: Current roadmap and tasks
-- **Issues**: Open questions and discussions
-- **Discussions**: Community conversations
+- **[README](../README.md)** - Project overview and setup
+- **[DEVELOPMENT.md](./DEVELOPMENT.md)** - Detailed development guide
+- **[TODO](./TODO.md)** - Current roadmap and tasks
+- **[Issues](https://github.com/lontar-rs/lbd/issues)** - Open questions and discussions
+- **[Discussions](https://github.com/lontar-rs/lbd/discussions)** - Community conversations
 
 ### **Contact**
-- **GitHub Issues**: For bugs and feature requests
-- **Discussions**: For general questions
-- **Maintainers**: For specific project inquiries
+- **[GitHub Issues](https://github.com/lontar-rs/lbd/issues)** - For bugs and feature requests
+- **[GitHub Discussions](https://github.com/lontar-rs/lbd/discussions)** - For general questions
+- **[Maintainers](https://github.com/lontar-rs/lbd)** - For specific project inquiries
 
 ---
 

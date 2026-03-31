@@ -1,3 +1,12 @@
+---
+layout: default
+title: "Changelog"
+description: "Version history and changes for the Lontar Balinese Dictionary"
+prev:
+  title: "API Reference"
+  url: "/docs/api/"
+---
+
 # 📋 Changelog
 
 All notable changes to the Lontar Balinese Dictionary project.
@@ -11,7 +20,7 @@ All notable changes to the Lontar Balinese Dictionary project.
 
 ---
 
-## [0.1.0] - 2024-03-31
+## [0.1.0] - 2026-03-31
 
 ### 🎉 **Major Release - First Working Dictionary**
 
@@ -80,7 +89,7 @@ All notable changes to the Lontar Balinese Dictionary project.
 
 ---
 
-## [0.0.1] - 2024-03-30
+## [0.0.1] - 2026-03-30
 
 ### 🏗️ **Initial Scaffold**
 - **Project Structure**: Complete Rust/SvelteKit project setup
@@ -179,8 +188,8 @@ All notable changes to the Lontar Balinese Dictionary project.
 - **Cultural Mission**: Preserve and celebrate Balinese linguistic heritage
 
 ### **Technical Evolution**
-- **2024-03-30**: Initial project scaffold with basic models
-- **2024-03-31**: Complete working dictionary with search and UI
+- **2026-03-30**: Initial project scaffold with basic models
+- **2026-03-31**: Complete working dictionary with search and UI
 - **Future**: Editorial tools, corpus integration, community features
 
 ---
@@ -223,9 +232,9 @@ All notable changes to the Lontar Balinese Dictionary project.
 
 ---
 
-**Last Updated: 2024-03-31**
+**Last Updated: {{ site.time | date: "%Y-%m-%d" }}**
 
-**Version: 0.1.0**
+**Version: v0.1.0**
 
 ---
 

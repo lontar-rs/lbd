@@ -1,6 +1,15 @@
-# TODO
+---
+layout: default
+title: "Roadmap"
+description: "Development roadmap and tasks for the Lontar Balinese Dictionary"
+prev:
+  title: "API Reference"
+  url: "/docs/api/"
+---
 
-Development roadmap for the Lontar Balinese Dictionary (LBD). Phases are sequential; later phases have hard dependencies on earlier ones.
+# 📋 Development Roadmap
+
+Complete development roadmap and tasks for the Lontar Balinese Dictionary project. Phases are sequential; later phases have hard dependencies on earlier ones.
 
 ---
 

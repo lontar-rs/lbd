@@ -1,3 +1,15 @@
+---
+layout: default
+title: "Installation"
+description: "Complete installation instructions for the Lontar Balinese Dictionary"
+prev:
+  title: "Quick Start"
+  url: "/docs/quickstart/"
+next:
+  title: "Development Guide"
+  url: "/docs/development/"
+---
+
 # 📦 Installation Guide
 
 Complete installation instructions for the Lontar Balinese Dictionary.

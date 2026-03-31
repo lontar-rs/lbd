@@ -1,3 +1,15 @@
+---
+layout: default
+title: "API Reference"
+description: "Complete API reference for the Lontar Balinese Dictionary backend service"
+prev:
+  title: "Contributing Guide"
+  url: "/docs/contributing/"
+next:
+  title: "Changelog"
+  url: "/docs/changelog/"
+---
+
 # 📡 API Documentation
 
 Complete API reference for the Lontar Balinese Dictionary backend service.
@@ -119,8 +131,8 @@ curl "http://localhost:3000/entries/padem"
     "lemma_aksara": null,
     "pos": "verb",
     "status": "published",
-    "created_at": "2024-03-31T13:00:00Z",
-    "updated_at": "2024-03-31T13:00:00Z"
+    "created_at": "2026-03-31T13:00:00Z",
+    "updated_at": "2026-03-31T13:00:00Z"
   },
   "senses": [
     {
@@ -166,8 +178,8 @@ Create a new dictionary entry.
     "lemma_aksara": null,
     "pos": "adjective",
     "status": "draft",
-    "created_at": "2024-03-31T13:00:00Z",
-    "updated_at": "2024-03-31T13:00:00Z"
+    "created_at": "2026-03-31T13:00:00Z",
+    "updated_at": "2026-03-31T13:00:00Z"
   },
   "senses": [],
   "registers": [],
@@ -226,7 +238,7 @@ curl "http://localhost:3000/entries/11111111-1111-1111-1111-111111111111/events"
       "pos": "verb",
       "status": "draft"
     },
-    "created_at": "2024-03-31T13:00:00Z"
+    "created_at": "2026-03-31T13:00:00Z"
   }
 ]
 ```
@@ -367,7 +379,7 @@ Get entries in the editorial queue.
       "id": "entry-uuid",
       "lemma_latin": "word",
       "status": "draft",
-      "created_at": "2024-03-31T13:00:00Z"
+      "created_at": "2026-03-31T13:00:00Z"
     }
   ],
   "awaiting_review": [],
@@ -385,7 +397,7 @@ Publish an entry.
 {
   "id": "entry-uuid",
   "status": "published",
-  "published_at": "2024-03-31T13:00:00Z"
+  "published_at": "2026-03-31T13:00:00Z"
 }
 ```
 
@@ -550,15 +562,17 @@ results = client.search('padem', 'bali')
 
 ## 📞 Support
 
-For API issues:
+### Resources
+- **[README](../README.md)** - Project overview and setup
+- **[DEVELOPMENT.md](./DEVELOPMENT.md)** - Detailed development guide
+- **[TODO](./TODO.md)** - Current roadmap and tasks
+- **[Issues](https://github.com/lontar-rs/lbd/issues)** - Open questions and discussions
+- **[Discussions](https://github.com/lontar-rs/lbd/discussions)** - Community conversations
 
-1. **Check this documentation** first
-2. **Search existing issues** on GitHub
-3. **Create an issue** with:
-   - API endpoint used
-   - Request parameters
-   - Response received
-   - Expected behavior
+### Contact
+- **[GitHub Issues](https://github.com/lontar-rs/lbd/issues)** - For API issues
+- **[GitHub Discussions](https://github.com/lontar-rs/lbd/discussions)** - For general questions
+- **[Maintainers](https://github.com/lontar-rs/lbd)** - For specific project inquiries
 
 ---
 
@@ -566,7 +580,7 @@ For API issues:
 
 **Base URL: http://localhost:3000**
 
-**Last Updated: 2024-03-31**
+**Last Updated: {{ site.time | date: "%Y-%m-%d" }}**
 
 ---
 

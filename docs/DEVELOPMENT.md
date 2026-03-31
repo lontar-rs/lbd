@@ -1,3 +1,15 @@
+---
+layout: default
+title: "Development Guide"
+description: "Detailed development setup and technical documentation for the Lontar Balinese Dictionary"
+prev:
+  title: "Installation"
+  url: "/docs/installation/"
+next:
+  title: "Contributing Guide"
+  url: "/docs/contributing/"
+---
+
 # 🛠️ Development Guide
 
 Detailed development setup and technical documentation for the Lontar Balinese Dictionary.
@@ -541,20 +553,16 @@ Docker configuration is planned for Phase 4B.
 ## 📚 Additional Resources
 
 ### Documentation
-- **[API.md](./API.md)** - Complete API reference
-- **[ARCHITECTURE.md](./ARCHITECTURE.md)** - System architecture
-- **[TODO.md](./TODO.md)** - Development roadmap
+- **[README](../README.md)** - Project overview and setup
+- **[DEVELOPMENT.md](./)** - Detailed development guide
+- **[TODO](./TODO.md)** - Current roadmap and tasks
+- **[Issues](https://github.com/lontar-rs/lbd/issues)** - Open questions and discussions
+- **[Discussions](https://github.com/lontar-rs/lbd/discussions)** - Community conversations
 
-### External Resources
-- **Rust Book** - https://doc.rust-lang.org/book/
-- **SvelteKit Docs** - https://kit.svelte.dev/
-- **Meilisearch Docs** - https://docs.meilisearch.com/
-- **PostgreSQL Docs** - https://www.postgresql.org/docs/
-
-### Community
-- **GitHub Issues** - Bug reports and questions
-- **GitHub Discussions** - General discussion
-- **Discord** (future) - Real-time chat
+### Contact
+- **[GitHub Issues](https://github.com/lontar-rs/lbd/issues)** - For bugs and feature requests
+- **[GitHub Discussions](https://github.com/lontar-rs/lbd/discussions)** - For general questions
+- **[Maintainers](https://github.com/lontar-rs/lbd)** - For specific project inquiries
 
 ---
 
