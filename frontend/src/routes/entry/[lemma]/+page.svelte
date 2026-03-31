@@ -39,7 +39,25 @@
 
 	function copyCitation(entry: any) {
 		const citation = formatCitation(entry);
-		navigator.clipboard.writeText(citation);
+		navigator.clipboard.writeText(citation)
+			.then(() => {
+				// Optional: Show success feedback
+				console.log('Citation copied to clipboard');
+			})
+			.catch(err => {
+				console.error('Failed to copy citation:', err);
+				// Fallback: Select text for manual copy
+				const textArea = document.createElement('textarea');
+				textArea.value = citation;
+				document.body.appendChild(textArea);
+				textArea.select();
+				try {
+					document.execCommand('copy');
+				} catch (fallbackErr) {
+					console.error('Fallback copy failed:', fallbackErr);
+				}
+				document.body.removeChild(textArea);
+			});
 	}
 </script>
 
@@ -71,7 +89,7 @@
 					</h1>
 					<div class="lemma-meta">
 						<span class="badge badge-register">{$currentEntry.register}</span>
-						<span class="badge badge-domain">{$currentEntry.pos}</span>
+						<span class="badge badge-pos">{$currentEntry.pos}</span>
 					</div>
 				</div>
 			</header>
@@ -274,6 +292,15 @@
 	.date-range {
 		color: var(--text-secondary);
 		font-weight: normal;
+	}
+
+	.badge-pos {
+		background: var(--color-secondary);
+		color: white;
+		padding: 0.25rem 0.5rem;
+		border-radius: 0.25rem;
+		font-size: 0.75rem;
+		font-weight: 500;
 	}
 
 	.attestation-quote {

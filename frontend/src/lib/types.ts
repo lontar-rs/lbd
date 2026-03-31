@@ -57,3 +57,25 @@ export interface SearchResponse {
 	processing_time_ms: number;
 	query: string;
 }
+
+// Corpus-related types
+export interface Corpus {
+	id: string;
+	title: string;
+	type: string;
+	date_range?: string;
+	location_held: string;
+	digitization_status: 'not_digitized' | 'partial' | 'complete';
+	source_url?: string;
+	institution?: string;
+	description?: string;
+}
+
+export interface CorpusAttestation {
+	id: string;
+	entry_lemma: string;
+	quote_latin: string;
+	quote_translation: string;
+	page_number?: string;
+	confidence: number;
+}

@@ -6,7 +6,7 @@
 
 	let query = '';
 	let debouncedQuery = '';
-	let searchTimeout: number;
+	let searchTimeout: ReturnType<typeof setTimeout>;
 
 	$: currentLanguage;
 	$: t = translations[currentLanguage] || translations.en;
@@ -45,7 +45,7 @@
 		// Set new timeout for debounced search
 		searchTimeout = setTimeout(() => {
 			debouncedQuery = query;
-		}, 300) as unknown as number;
+		}, 300);
 	}
 
 	function handleSubmit(event: Event) {

@@ -44,7 +44,7 @@ pub struct Attestation {
     pub quote_latin: Option<String>,
     pub quote_trans_id: Option<String>,
     pub quote_trans_en: Option<String>,
-    pub confidence: Option<f32>,
+    pub confidence: Option<f64>, // Changed to f64 to match NUMERIC(3,2)
     pub source_rank: i32,
     pub created_at: DateTime<Utc>,
 }

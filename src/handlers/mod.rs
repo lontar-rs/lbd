@@ -5,6 +5,7 @@ use crate::search::client::SearchClient;
 
 pub mod corpus;
 pub mod entries;
+pub mod events;
 pub mod exports;
 pub mod search;
 
@@ -20,6 +21,7 @@ pub fn routes() -> Router<AppState> {
         .merge(entries::routes())
         .merge(search::routes())
         .merge(corpus::routes())
+        .merge(events::routes())
         .merge(exports::routes())
         .route("/health", get(|| async { "ok" }))
 }

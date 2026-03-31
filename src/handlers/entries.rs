@@ -4,20 +4,55 @@ use axum::{
     routing::{get, post, put},
     Json, Router,
 };
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{auth::jwt_middleware, error::AppError, models::entry::Entry};
+use crate::{
+    auth::jwt_middleware,
+    error::AppError,
+    models::{
+        entry::{Attestation, Entry, Sense},
+        etymology::Etymology,
+        register::EntryRegister,
+    },
+};
 
 use super::AppState;
+
+// Helper function to log entry events
+async fn log_entry_event(
+    pool: &sqlx::PgPool,
+    entry_id: Uuid,
+    event_type: &str,
+    diff: serde_json::Value,
+    editor_id: Option<Uuid>,
+) -> Result<(), AppError> {
+    let event_id = Uuid::new_v4();
+
+    sqlx::query!(
+        r#"
+        INSERT INTO entry_event (id, entry_id, editor_id, event_type, diff, created_at)
+        VALUES ($1, $2, $3, $4, $5, NOW())
+        "#,
+        event_id,
+        entry_id,
+        editor_id,
+        event_type,
+        diff
+    )
+    .execute(pool)
+    .await
+    .map_err(|e| AppError::Database(format!("event log error: {e}")))?;
+
+    Ok(())
+}
 
 #[derive(Serialize)]
 struct EntryResponse {
     entry: Entry,
-    senses: Vec<SenseDto>,
-    registers: Vec<RegisterDto>,
-    etymologies: Vec<EtymologyDto>,
+    senses: Vec<Sense>,
+    registers: Vec<EntryRegister>,
+    etymologies: Vec<Etymology>,
 }
 
 #[derive(Deserialize)]
@@ -26,57 +61,11 @@ struct CreateEntryRequest {
     pos: Option<String>,
 }
 
-#[derive(Serialize)]
-struct SenseDto {
-    id: Uuid,
-    sense_order: i32,
-    def_balinese: Option<String>,
-    def_indonesian: String,
-    def_english: Option<String>,
-    domain: Option<String>,
-    created_at: DateTime<Utc>,
-}
-
-#[derive(Serialize)]
-struct RegisterDto {
-    level: String,
-    dialect: Option<String>,
-    equivalent_id: Option<Uuid>,
-}
-
 #[derive(Deserialize)]
 #[allow(dead_code)]
 struct UpdateEntryRequest {
     pos: Option<String>,
     status: Option<String>,
-}
-
-#[derive(Serialize)]
-struct EtymologyDto {
-    id: Uuid,
-    proto_austronesian: Option<String>,
-    proto_mp: Option<String>,
-    sanskrit: Option<String>,
-    kawi: Option<String>,
-    old_balinese: Option<String>,
-    loan_source: Option<String>,
-    loan_form: Option<String>,
-    notes: Option<String>,
-    confidence: String,
-}
-
-#[derive(Serialize)]
-struct AttestationDto {
-    id: Uuid,
-    sense_id: Uuid,
-    corpus_id: Uuid,
-    quote_aksara: Option<String>,
-    quote_latin: Option<String>,
-    quote_trans_id: Option<String>,
-    quote_trans_en: Option<String>,
-    confidence: Option<f32>,
-    source_rank: i32,
-    created_at: DateTime<Utc>,
 }
 
 pub fn routes() -> Router<AppState> {
@@ -111,9 +100,10 @@ async fn get_entry(
     .map_err(|e| AppError::Database(format!("query error: {e}")))?
     .ok_or(AppError::NotFound)?;
 
-    let senses = sqlx::query!(
+    let senses = sqlx::query_as!(
+        Sense,
         r#"
-        SELECT id, sense_order, def_balinese, def_indonesian, def_english, domain, created_at
+        SELECT id, entry_id as "entry_id!", sense_order, def_balinese, def_indonesian, def_english, domain, created_at
         FROM sense
         WHERE entry_id = $1
         ORDER BY sense_order
@@ -122,22 +112,12 @@ async fn get_entry(
     )
     .fetch_all(&state.pool)
     .await
-    .map_err(|e| AppError::Database(format!("senses query error: {e}")))?
-    .into_iter()
-    .map(|row| SenseDto {
-        id: row.id,
-        sense_order: row.sense_order,
-        def_balinese: row.def_balinese,
-        def_indonesian: row.def_indonesian,
-        def_english: row.def_english,
-        domain: row.domain,
-        created_at: row.created_at,
-    })
-    .collect();
+    .map_err(|e| AppError::Database(format!("senses query error: {e}")))?;
 
-    let registers = sqlx::query!(
+    let registers = sqlx::query_as!(
+        EntryRegister,
         r#"
-        SELECT level, dialect, equivalent_id
+        SELECT entry_id, level, dialect, equivalent_id
         FROM entry_register
         WHERE entry_id = $1
         "#,
@@ -145,18 +125,12 @@ async fn get_entry(
     )
     .fetch_all(&state.pool)
     .await
-    .map_err(|e| AppError::Database(format!("register query error: {e}")))?
-    .into_iter()
-    .map(|row| RegisterDto {
-        level: row.level,
-        dialect: row.dialect,
-        equivalent_id: row.equivalent_id,
-    })
-    .collect();
+    .map_err(|e| AppError::Database(format!("register query error: {e}")))?;
 
-    let etymologies = sqlx::query!(
+    let etymologies = sqlx::query_as!(
+        Etymology,
         r#"
-        SELECT id, proto_austronesian, proto_mp, sanskrit, kawi, old_balinese, loan_source, loan_form, notes, confidence
+        SELECT id, entry_id as "entry_id!", proto_austronesian, proto_mp, sanskrit, kawi, old_balinese, loan_source, loan_form, notes, confidence
         FROM etymology
         WHERE entry_id = $1
         "#,
@@ -164,21 +138,7 @@ async fn get_entry(
     )
     .fetch_all(&state.pool)
     .await
-    .map_err(|e| AppError::Database(format!("etymology query error: {e}")))?
-    .into_iter()
-    .map(|row| EtymologyDto {
-        id: row.id,
-        proto_austronesian: row.proto_austronesian,
-        proto_mp: row.proto_mp,
-        sanskrit: row.sanskrit,
-        kawi: row.kawi,
-        old_balinese: row.old_balinese,
-        loan_source: row.loan_source,
-        loan_form: row.loan_form,
-        notes: row.notes,
-        confidence: row.confidence,
-    })
-    .collect();
+    .map_err(|e| AppError::Database(format!("etymology query error: {e}")))?;
 
     Ok(Json(EntryResponse {
         entry,
@@ -253,6 +213,8 @@ async fn create_entry(
         return Err(AppError::Validation("lemma_latin required".into()));
     }
 
+    let entry_id = Uuid::new_v4();
+
     let rec = sqlx::query_as!(
         Entry,
         r#"
@@ -260,13 +222,22 @@ async fn create_entry(
         VALUES ($1, $2, $3, 'draft')
         RETURNING id, lemma_latin, lemma_aksara, ipa, pos, root, status, created_at, updated_at
     "#,
-        Uuid::new_v4(),
+        entry_id,
         payload.lemma_latin.trim(),
         payload.pos
     )
     .fetch_one(&state.pool)
     .await
     .map_err(|e| AppError::Database(format!("insert error: {e}")))?;
+
+    // Log creation event
+    let diff = serde_json::json!({
+        "lemma_latin": payload.lemma_latin.trim(),
+        "pos": payload.pos,
+        "status": "draft",
+    });
+
+    log_entry_event(&state.pool, entry_id, "create", diff, None).await?;
 
     Ok(Json(EntryResponse {
         entry: rec,
@@ -337,24 +308,13 @@ async fn update_entry(
     };
 
     // Log event
-    let event_id = Uuid::new_v4();
     let diff = serde_json::json!({
         "pos": payload.pos,
         "status": payload.status,
+        "previous_status": prev_status,
     });
 
-    sqlx::query!(
-        r#"
-        INSERT INTO entry_event (id, entry_id, event_type, diff)
-        VALUES ($1, $2, 'update', $3)
-        "#,
-        event_id,
-        id,
-        diff
-    )
-    .execute(&mut *tx)
-    .await
-    .map_err(|e| AppError::Database(format!("event log error: {e}")))?;
+    log_entry_event(&state.pool, id, "update", diff, None).await?;
 
     tx.commit()
         .await
@@ -372,9 +332,10 @@ async fn update_entry(
     }
 
     // Fetch full entry with related data
-    let senses = sqlx::query!(
+    let senses = sqlx::query_as!(
+        Sense,
         r#"
-        SELECT id, sense_order, def_balinese, def_indonesian, def_english, domain, created_at
+        SELECT id, entry_id as "entry_id!", sense_order, def_balinese, def_indonesian, def_english, domain, created_at
         FROM sense
         WHERE entry_id = $1
         ORDER BY sense_order
@@ -383,41 +344,25 @@ async fn update_entry(
     )
     .fetch_all(&state.pool)
     .await
-    .map_err(|e| AppError::Database(format!("sense query error: {e}")))?
-    .into_iter()
-    .map(|row| SenseDto {
-        id: row.id,
-        sense_order: row.sense_order,
-        def_balinese: row.def_balinese,
-        def_indonesian: row.def_indonesian,
-        def_english: row.def_english,
-        domain: row.domain,
-        created_at: row.created_at,
-    })
-    .collect();
+    .map_err(|e| AppError::Database(format!("sense query error: {e}")))?;
 
-    let registers = sqlx::query_as::<_, (String, Option<String>, Option<Uuid>)>(
+    let registers = sqlx::query_as!(
+        EntryRegister,
         r#"
-        SELECT level, dialect, equivalent_id
+        SELECT entry_id as "entry_id!", level, dialect, equivalent_id
         FROM entry_register
         WHERE entry_id = $1
         "#,
+        id
     )
-    .bind(id)
     .fetch_all(&state.pool)
     .await
-    .map_err(|e| AppError::Database(format!("register query error: {e}")))?
-    .into_iter()
-    .map(|(level, dialect, equivalent_id)| RegisterDto {
-        level,
-        dialect,
-        equivalent_id,
-    })
-    .collect();
+    .map_err(|e| AppError::Database(format!("register query error: {e}")))?;
 
-    let etymologies = sqlx::query!(
+    let etymologies = sqlx::query_as!(
+        Etymology,
         r#"
-        SELECT id, proto_austronesian, proto_mp, sanskrit, kawi, old_balinese, loan_source, loan_form, notes, confidence
+        SELECT id, entry_id as "entry_id!", proto_austronesian, proto_mp, sanskrit, kawi, old_balinese, loan_source, loan_form, notes, confidence
         FROM etymology
         WHERE entry_id = $1
         "#,
@@ -425,21 +370,7 @@ async fn update_entry(
     )
     .fetch_all(&state.pool)
     .await
-    .map_err(|e| AppError::Database(format!("etymology query error: {e}")))?
-    .into_iter()
-    .map(|row| EtymologyDto {
-        id: row.id,
-        proto_austronesian: row.proto_austronesian,
-        proto_mp: row.proto_mp,
-        sanskrit: row.sanskrit,
-        kawi: row.kawi,
-        old_balinese: row.old_balinese,
-        loan_source: row.loan_source,
-        loan_form: row.loan_form,
-        notes: row.notes,
-        confidence: row.confidence,
-    })
-    .collect();
+    .map_err(|e| AppError::Database(format!("etymology query error: {e}")))?;
 
     Ok(Json(EntryResponse {
         entry,
@@ -452,9 +383,10 @@ async fn update_entry(
 async fn get_attestations(
     State(state): State<AppState>,
     Path(id): Path<Uuid>,
-) -> Result<Json<Vec<AttestationDto>>, AppError> {
+) -> Result<Json<Vec<Attestation>>, AppError> {
     // Fetch attestations by entry id via senses
-    let rows = sqlx::query!(
+    let attestations = sqlx::query_as!(
+        Attestation,
         r#"
         SELECT a.id, a.sense_id as "sense_id!", a.corpus_id as "corpus_id!", a.quote_aksara, a.quote_latin, a.quote_trans_id, a.quote_trans_en, a.confidence::float8 as confidence, a.source_rank, a.created_at
         FROM attestation a
@@ -468,21 +400,5 @@ async fn get_attestations(
     .await
     .map_err(|e| AppError::Database(format!("attestation query error: {e}")))?;
 
-    let attns = rows
-        .into_iter()
-        .map(|row| AttestationDto {
-            id: row.id,
-            sense_id: row.sense_id,
-            corpus_id: row.corpus_id,
-            quote_aksara: row.quote_aksara,
-            quote_latin: row.quote_latin,
-            quote_trans_id: row.quote_trans_id,
-            quote_trans_en: row.quote_trans_en,
-            confidence: row.confidence.map(|c| c as f32),
-            source_rank: row.source_rank,
-            created_at: row.created_at,
-        })
-        .collect();
-
-    Ok(Json(attns))
+    Ok(Json(attestations))
 }

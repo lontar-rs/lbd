@@ -1,4 +1,4 @@
-import type { Entry, SearchResponse } from '$lib/types';
+import type { Entry, SearchResponse, Corpus, CorpusAttestation } from '$lib/types';
 
 const API_BASE = '/api';
 
@@ -16,24 +16,54 @@ export class ApiClient {
 			...(filter && { filter })
 		});
 
-		const response = await fetch(`${this.baseUrl}/entries/search?${params}`);
-		if (!response.ok) {
-			throw new Error(`Search failed: ${response.statusText}`);
+		try {
+			const response = await fetch(`${this.baseUrl}/entries/search?${params}`);
+			if (!response.ok) {
+				throw new Error(`Search failed: ${response.statusText}`);
+			}
+			return response.json();
+		} catch (error) {
+			if (error instanceof Error) {
+				// Re-throw HTTP errors as-is
+				if (error.message.includes('Search failed:')) {
+					throw error;
+				}
+				// Handle network errors
+				if (error.name === 'TypeError' && error.message.includes('fetch')) {
+					throw new Error('Network error: Unable to connect to server. Please check your internet connection.');
+				}
+				// Handle timeout errors
+				if (error.name === 'AbortError') {
+					throw new Error('Request timeout: The search request took too long.');
+				}
+			}
+			throw new Error('Search failed: An unexpected error occurred.');
 		}
-
-		return response.json();
 	}
 
 	async getEntry(lemma: string): Promise<Entry> {
-		const response = await fetch(`${this.baseUrl}/entries/${encodeURIComponent(lemma)}`);
-		if (!response.ok) {
-			if (response.status === 404) {
-				throw new Error('Entry not found');
+		try {
+			const response = await fetch(`${this.baseUrl}/entries/${encodeURIComponent(lemma)}`);
+			if (!response.ok) {
+				if (response.status === 404) {
+					throw new Error('Entry not found');
+				}
+				throw new Error(`Failed to fetch entry: ${response.statusText}`);
 			}
-			throw new Error(`Failed to fetch entry: ${response.statusText}`);
+			return response.json();
+		} catch (error) {
+			if (error instanceof Error) {
+				// Re-throw known errors as-is
+				if (error.message.includes('Entry not found') || error.message.includes('Failed to fetch entry:')) {
+					throw error;
+				}
+				// Handle network errors
+				if (error.name === 'TypeError' && error.message.includes('fetch')) {
+					throw new Error('Network error: Unable to connect to server. Please check your internet connection.');
+				}
+			}
+			throw new Error('Failed to load entry: An unexpected error occurred.');
 		}
-
-		return response.json();
 	}
 
 	async getEntryAttestations(id: string) {
@@ -45,13 +75,51 @@ export class ApiClient {
 		return response.json();
 	}
 
-	async getCorpus(id: string) {
-		const response = await fetch(`${this.baseUrl}/corpus/${id}`);
-		if (!response.ok) {
-			throw new Error(`Failed to fetch corpus: ${response.statusText}`);
+	async getCorpus(id: string): Promise<Corpus> {
+		try {
+			const response = await fetch(`${this.baseUrl}/corpus/${id}`);
+			if (!response.ok) {
+				if (response.status === 404) {
+					throw new Error('Corpus not found');
+				}
+				throw new Error(`Failed to fetch corpus: ${response.statusText}`);
+			}
+			return response.json();
+		} catch (error) {
+			if (error instanceof Error) {
+				// Re-throw known errors as-is
+				if (error.message.includes('Corpus not found') || error.message.includes('Failed to fetch corpus:')) {
+					throw error;
+				}
+				// Handle network errors
+				if (error.name === 'TypeError' && error.message.includes('fetch')) {
+					throw new Error('Network error: Unable to connect to server. Please check your internet connection.');
+				}
+			}
+			throw new Error('Failed to load corpus: An unexpected error occurred.');
 		}
+	}
 
-		return response.json();
+	async getCorpusAttestations(id: string): Promise<CorpusAttestation[]> {
+		try {
+			const response = await fetch(`${this.baseUrl}/corpus/${id}/attestations`);
+			if (!response.ok) {
+				throw new Error(`Failed to fetch corpus attestations: ${response.statusText}`);
+			}
+			return response.json();
+		} catch (error) {
+			if (error instanceof Error) {
+				// Re-throw known errors as-is
+				if (error.message.includes('Failed to fetch corpus attestations:')) {
+					throw error;
+				}
+				// Handle network errors
+				if (error.name === 'TypeError' && error.message.includes('fetch')) {
+					throw new Error('Network error: Unable to connect to server. Please check your internet connection.');
+				}
+			}
+			throw new Error('Failed to load attestations: An unexpected error occurred.');
+		}
 	}
 }
 

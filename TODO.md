@@ -4,7 +4,7 @@ Development roadmap for the Lontar Balinese Dictionary (LBD). Phases are sequent
 
 ---
 
-## Phase 0 — Foundation 🔴
+## Phase 0 — Foundation ✅
 
 _Schema, governance, and seed data. No code until this is solid._
 
@@ -35,7 +35,7 @@ _Schema, governance, and seed data. No code until this is solid._
 
 ---
 
-## Phase 1 — API and Search 🔴
+## Phase 1 — API and Search ✅
 
 _Working read API backed by seed data. No Aksara rendering yet._
 
@@ -59,7 +59,7 @@ _Working read API backed by seed data. No Aksara rendering yet._
 
 ---
 
-## Phase 1.5 — Public Web UI 🔴
+## Phase 1.5 — Public Web UI ✅
 
 _The public dictionary interface. Depends on Phase 1 API. Latin romanization only — Aksara rendering deferred to Phase 2._
 
@@ -89,10 +89,10 @@ _The public dictionary interface. Depends on Phase 1 API. Latin romanization onl
   - [x] Browse by domain (ritual | medical | agricultural | ...)
   - [x] Browse by register level
   - [x] Browse by etymology origin (Sanskrit | Kawi | Austronesian | Dutch | ...)
-- [ ] Corpus page (`/corpus/:id`)
-  - [ ] Manuscript metadata: title, type, date range, location held, digitization status
-  - [ ] List of attestations derived from this corpus
-  - [ ] Link to source image (Internet Archive or institutional) where available
+- [x] Corpus page (`/corpus/:id`)
+  - [x] Manuscript metadata: title, type, date range, location held, digitization status
+  - [x] List of attestations derived from this corpus
+  - [x] Link to source image (Internet Archive or institutional) where available
 - [x] Static pages
   - [x] About LBD: scope, methodology, relationship to OED model
   - [x] Sources: full bibliography of primary sources and foundational lexicographic works

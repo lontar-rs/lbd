@@ -3,13 +3,15 @@
 	import { api } from '$lib/api';
 	import { currentLanguage } from '$lib/stores';
 	import { translations, type Language } from '$lib/translations';
+	import LoadingSkeleton from '$lib/components/LoadingSkeleton.svelte';
 
 	$: currentLanguage;
 	$: t = translations[currentLanguage] || translations.en;
 
 	let entries: any[] = [];
-	let loading = boolean = true;
+	let loading: boolean = true;
 	let error: string | null = null;
+	let abortController: AbortController | null = null;
 	let browseMode: 'alphabetical' | 'domain' | 'register' | 'etymology' = 'alphabetical';
 	let selectedLetter: string = 'A';
 	let selectedDomain: string = '';
@@ -26,6 +28,12 @@
 	});
 
 	async function loadEntries() {
+		// Cancel any ongoing request
+		if (abortController) {
+			abortController.abort();
+		}
+
+		abortController = new AbortController();
 		loading = true;
 		error = null;
 
@@ -53,12 +61,21 @@
 			}
 
 			const results = await api.searchEntries(query, 'bali', filter);
-			entries = results.hits;
+			// Only update if request wasn't aborted
+			if (!abortController.signal.aborted) {
+				entries = results.hits;
+			}
 		} catch (err) {
-			error = err instanceof Error ? err.message : 'Failed to load entries';
-			entries = [];
+			// Don't show error if request was aborted
+			if (!abortController.signal.aborted) {
+				error = err instanceof Error ? err.message : 'Failed to load entries';
+				entries = [];
+			}
 		} finally {
-			loading = false;
+			if (!abortController.signal.aborted) {
+				loading = false;
+			}
+			abortController = null;
 		}
 	}
 
@@ -184,7 +201,9 @@
 	</nav>
 
 	<main class="browse-content">
-		{#if loading}
+		{#if loading && entries.length === 0}
+			<LoadingSkeleton count={6} type="entry" />
+		{:else if loading}
 			<div class="loading">Loading entries...</div>
 		{:else if error}
 			<div class="error">

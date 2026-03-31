@@ -7,7 +7,7 @@ pub struct EntryEvent {
     pub id: Uuid,
     pub entry_id: Uuid,
     pub editor_id: Option<Uuid>,
-    pub event_type: String,
+    pub event_type: Option<String>,
     pub diff: serde_json::Value,
     pub created_at: DateTime<Utc>,
 }
