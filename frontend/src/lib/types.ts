@@ -48,6 +48,7 @@ export interface SearchResult {
 	lemma_latin: string;
 	register: string;
 	first_sense: string;
+	first_sense_en?: string;
 	domain: string;
 }
 

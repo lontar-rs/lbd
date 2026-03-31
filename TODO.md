@@ -161,13 +161,26 @@ _Depends on `lontar-ocr` Phase 1c (full pipeline) completion._
 
 _Tooling for editors and institutional contributors._
 
+### Phase 4A: Basic Editorial UI (Next Sprint)
+- [ ] Create /admin routes with authentication
+- [ ] Build entry queue: draft → review → publish workflow
+- [ ] Simple approve/reject interface
+- [ ] Entry status management (bulk operations)
+
+### Phase 4B: Advanced Tools (Following Sprints)
+- [ ] Diff view using our EntryEvent logs
+- [ ] Attestation linking system
+- [ ] Register/etymology editors
 - [ ] Editorial UI (web, Rust backend + minimal frontend)
   - [ ] Entry queue: draft | awaiting review | disputed
   - [ ] Diff view for entry revisions (from event log)
   - [ ] Attestation viewer: manuscript image + OCR output + linked entry
   - [ ] Register cross-link editor (unda-usuk graph)
-  - [ ] Etymology chain editor
-  - [ ] Dispute workflow: flag → discussion → resolution
+
+### Phase 4C: Community Features (Later)
+- [ ] User authentication system
+- [ ] Contribution forms
+- [ ] Discussion/dispute workflows
 - [ ] Community contribution
   - [ ] Authenticated submission form (new entry draft)
   - [ ] Usage example submission (feeds attestation queue)

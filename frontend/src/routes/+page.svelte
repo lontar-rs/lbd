@@ -161,6 +161,9 @@
 						</div>
 						<div class="result-definition">
 							{result.first_sense}
+							{#if result.first_sense_en}
+								<div class="english-definition">{result.first_sense_en}</div>
+							{/if}
 						</div>
 					</a>
 				{/each}
@@ -300,6 +303,13 @@
 	.result-definition {
 		color: var(--text-secondary);
 		line-height: 1.5;
+	}
+
+	.english-definition {
+		font-style: italic;
+		margin-top: 0.5rem;
+		color: var(--text-muted);
+		font-size: 0.9rem;
 	}
 
 	.loading, .no-results {
