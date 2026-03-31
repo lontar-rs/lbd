@@ -23,3 +23,11 @@ apk_extraction/
 
 # Data - large files
 data/
+meilisearch
+data.ms/
+*.sqlite
+
+# Exports and backups
+exports/
+*.sqlite
+*.sqlite3
