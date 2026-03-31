@@ -38,16 +38,193 @@ register_equivalents:
 
 ---
 
-## Relationship to the Lontar Ecosystem
+## 🚀 Quick Start
 
-LBD is built on two existing projects:
+Get the Lontar Balinese Dictionary running in minutes with our automated setup:
 
-| Project | Role in LBD |
-|---|---|
-| [`lontar-ocr`](https://github.com/your-org/lontar-ocr) | Corpus ingestion — converts manuscript images to Unicode text, feeds the attestation layer |
-| [`lontar`](https://github.com/your-org/lontar) | Rendering and export — Aksara Bali text shaping (`lontar-aksara`), scholarly output formats (DOCX, PDF, LaTeX) |
+```bash
+# Clone the repository
+git clone https://github.com/your-org/lontar-rs/lbd.git
+cd lbd
 
-LBD is not a standalone project. It is the dictionary layer that makes the outputs of `lontar-ocr` and `lontar` meaningful as preservation infrastructure.
+# Run the automated setup (installs everything)
+./scripts/setup.sh
+
+# Start all services
+./scripts/start.sh
+
+# Open your browser
+open http://localhost:5173
+```
+
+**That's it!** The setup script handles:
+- ✅ All dependencies (Rust, Node.js, PostgreSQL, Meilisearch)
+- ✅ Database setup and migrations
+- ✅ 45,000+ Balinese words imported
+- ✅ Trilingual search configured
+- ✅ Development environment ready
+
+---
+
+## 📋 Current Status
+
+### ✅ **Working Features**
+- **🔍 Trilingual Search**: Balinese → Indonesian → English
+- **📚 45K+ Entries**: Imported from Balai Bahasa dictionary
+- **🎯 Register Stratification**: alus singgih, alus sor, andap, kasar
+- **🔧 Editorial Workflow**: Draft → Review → Publish (Wikipedia-style)
+- **🌐 Modern Web UI**: SvelteKit frontend with responsive design
+- **⚡ Fast Search**: Meilisearch-powered instant search
+- **📖 Entry Pages**: Detailed word definitions with etymology
+- **🔒 Security**: JWT authentication and proper credential management
+
+### 🚧 **In Development**
+- **📝 Editorial Interface**: Phase 4A - Basic admin UI (Next Sprint)
+- **📜 Aksara Bali Rendering**: Unicode Balinese script display
+- **📋 Corpus Attestations**: Manuscript evidence linking
+- **🤝 Community Features**: User contributions and discussions
+
+---
+
+## 🛠️ Development Setup
+
+### Prerequisites
+- **Git** for version control
+- **Terminal/shell** access
+- **Internet connection** (for downloads)
+
+### Automated Setup (Recommended)
+```bash
+./scripts/setup.sh
+```
+
+### Manual Setup
+If you prefer manual setup, see [DEVELOPMENT.md](./DEVELOPMENT.md) for detailed instructions.
+
+---
+
+## 🔧 Service Management
+
+All services are managed through simple scripts:
+
+```bash
+# Start all services
+./scripts/start.sh
+
+# Stop all services
+./scripts/stop.sh
+
+# Check service status
+./scripts/status.sh
+```
+
+### Services
+- **Frontend**: http://localhost:5173 (SvelteKit)
+- **Backend API**: http://localhost:3000 (Rust/Axum)
+- **Database**: PostgreSQL (localhost:5432)
+- **Search**: Meilisearch (localhost:7700)
+
+---
+
+## 📚 Project Structure
+
+```
+lbd/
+├── src/                    # Rust backend
+│   ├── handlers/           # API endpoints
+│   ├── models/            # Data models
+│   └── search/            # Search integration
+├── frontend/               # SvelteKit frontend
+│   ├── src/lib/          # Components and utilities
+│   └── src/routes/       # Page components
+├── scripts/               # Management scripts
+│   ├── setup.sh          # 🌱 First-time setup
+│   ├── start.sh          # 🚀 Start services
+│   ├── stop.sh           # 🛑 Stop services
+│   └── status.sh         # 📊 Check status
+├── data/                  # Dictionary data
+│   └── balai_bahasa_*.csv # 45K+ word corpus
+└── migrations/            # Database schema
+```
+
+---
+
+## 🎯 Usage Examples
+
+### Search for Words
+```bash
+# Search in the web interface
+http://localhost:5173?q=padem
+
+# Or via API
+curl "http://localhost:3000/entries/search?q=padem&lang=bali"
+```
+
+### Import New Data
+```bash
+# Import from CSV
+cargo run --bin import -- --file data/new_words.csv --source custom
+
+# Update search index
+./scripts/index_search.sh
+```
+
+### Database Operations
+```bash
+# Run migrations
+sqlx migrate run
+
+# Access database directly
+psql $DATABASE_URL
+```
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines.
+
+### Quick Contribution Guide
+1. **Fork** the repository
+2. **Run setup**: `./scripts/setup.sh`
+3. **Create feature branch**
+4. **Make changes** and test
+5. **Submit pull request**
+
+### Areas for Contribution
+- **📝 Editorial Interface**: Help build Phase 4A admin tools
+- **📜 Aksara Bali**: Implement Balinese script rendering
+- **🌐 Internationalization**: Add more languages
+- **📱 Mobile UI**: Improve mobile experience
+- **📚 Content**: Add more dictionary entries
+- **🔍 Search**: Enhance search algorithms
+
+---
+
+## � Documentation
+
+Complete documentation is available in the [`docs/`](./docs) folder:
+
+### 🚀 **Getting Started**
+- **[📖 Documentation Index](./docs/index.md)** - Complete documentation hub
+- **[🌱 Quick Start](./docs/quickstart.md)** - 5-minute guide to get running
+- **[📦 Installation](./docs/installation.md)** - Detailed installation instructions
+
+### 🛠️ **Development**
+- **[🤝 Contributing Guide](./docs/CONTRIBUTING.md)** - Contribution guidelines
+- **[🛠️ Development Guide](./docs/DEVELOPMENT.md)** - Detailed development setup
+- **[📡 API Reference](./docs/API.md)** - Complete API documentation
+
+### 📋 **Project Information**
+- **[📋 TODO/Roadmap](./docs/TODO.md)** - Development roadmap and tasks
+- **[📋 Changelog](./docs/CHANGELOG.md)** - Version history and changes
+- **[📜 License](./LICENSE)** - Project license information
+
+### 🔧 **Technical Reference**
+- **[🏗️ Architecture](./docs/ARCHITECTURE.md)** - System architecture and design
+- **[🗄️ Database Schema](./docs/database.md)** - Database structure and relationships
+- **[🔍 Search System](./docs/search.md)** - Search functionality and Meilisearch
+- **[🚀 Deployment](./docs/deployment.md)** - Production deployment guide
 
 ---
 
