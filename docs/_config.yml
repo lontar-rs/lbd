@@ -9,7 +9,7 @@ url: "https://lontar-rs.github.io"
 # Build settings
 markdown: kramdown
 highlighter: rouge
-theme: minima
+# theme: minima  # Removed - using custom theme
 
 # Plugins
 plugins:
